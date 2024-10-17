@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Edit Room - TSU CCS Lab Management{% endblock %}
+{% block content %}
+<h2>Edit Room</h2>
+<form method="POST" action="{{ url_for('admin.edit_room', room_id=room.id) }}">
+    <div class="form-group">
+        <label for="room_name">Room Name</label>
+        <input type="text" class="form-control" name="room_name" id="room_name" value="{{ room.room_name }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Room</button>
+</form>
+<a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+{% endblock %}

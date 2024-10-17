@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Create Subject{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Create Subject</h2>
+    <form method="POST">
+        <!-- Subject Code -->
+        <div class="mb-3">
+            <label for="subject_code" class="form-label">Subject Code</label>
+            <input type="text" class="form-control" id="subject_code" name="subject_code" required>
+        </div>
+        <!-- Subject Name -->
+        <div class="mb-3">
+            <label for="subject_name" class="form-label">Subject Name</label>
+            <input type="text" class="form-control" id="subject_name" name="subject_name" required>
+        </div>
+        <!-- Room -->
+        <div class="mb-3">
+            <label for="room_id" class="form-label">Select Room</label>
+            <select class="form-select" id="room_id" name="room_id" required>
+                <option value="" disabled selected>Select a room</option>
+                {% for room in rooms %}
+                <option value="{{ room.id }}">{{ room.room_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <!-- Start Time -->
+        <div class="mb-3">
+            <label for="start_time" class="form-label">Start Time</label>
+            <input type="datetime-local" class="form-control" id="start_time" name="start_time" required>
+        </div>
+        <!-- End Time -->
+        <div class="mb-3">
+            <label for="end_time" class="form-label">End Time</label>
+            <input type="datetime-local" class="form-control" id="end_time" name="end_time" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Subject</button>
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </form>
+</div>
+{% endblock %}

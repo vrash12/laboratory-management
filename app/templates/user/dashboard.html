@@ -1,0 +1,206 @@
+<!-- app/templates/user/dashboard.html -->
+
+{% extends 'base.html' %}
+{% block title %}User Dashboard{% endblock %}
+{% block head %}
+    <!-- Include FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <style>
+        .btn-report-issue {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #343a40;
+            color: #fff;
+        }
+        .maintenance-status {
+            font-weight: bold;
+        }
+        .maintenance-status.Scheduled {
+            color: #ffc107; /* Warning */
+        }
+        .maintenance-status.In\ Progress {
+            color: #17a2b8; /* Info */
+        }
+        .maintenance-status.Completed {
+            color: #28a745; /* Success */
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1>Welcome, {{ current_user.full_name }}!</h1>
+
+    <!-- Report Issue Button -->
+    <a href="{{ url_for('main.report_issue') }}" class="btn btn-primary btn-report-issue">Report an Issue</a>
+
+    <!-- Profile Section -->
+    <div class="card">
+        <div class="card-header">
+            Your Profile
+        </div>
+        <div class="card-body">
+            <p><strong>Full Name:</strong> {{ current_user.full_name }}</p>
+            <p><strong>Email:</strong> {{ current_user.email }}</p>
+            <p><strong>Student Number:</strong> {{ current_user.student_number }}</p>
+
+        </div>
+    </div>
+
+    <!-- Subjects Section -->
+<!-- Subjects Section -->
+<div class="card">
+    <div class="card-header">
+        Your Subjects
+    </div>
+    <div class="card-body">
+        {% if subjects %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Subject Code</th>
+                        <th>Subject Name</th>
+                        <th>Room</th>
+                        <th>Schedule</th>
+                        <th>Your PC</th>
+                        <th>Maintenance Status</th>
+                        <th>Actions</th> <!-- New Column -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects %}
+                    <tr>
+                        <td>{{ subject.subject_code }}</td>
+                        <td>{{ subject.subject_name }}</td>
+                        <td>{{ subject.room.room_name }}</td>
+                        <td>{{ subject.start_time.strftime('%Y-%m-%d %H:%M') }} - {{ subject.end_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if pc_assignments.get(subject.id) %}
+                                {{ pc_assignments[subject.id].equipment.equipment_name }}
+                            {% else %}
+                                Not Assigned
+                            {% endif %}
+                        </td>
+                    
+                        {% if pc_assignments.get(subject.id) %}
+                            {% set equipment = pc_assignments[subject.id].equipment %}
+                            {% set maintenance = equipment.maintenances | selectattr('status', 'in', ['Scheduled', 'In Progress']) | list | first %}
+                        {% else %}
+                            {% set maintenance = None %}
+                        {% endif %}
+                    
+                        <td>
+                            {% if maintenance %}
+                                <span class="maintenance-status {{ maintenance.status }}">{{ maintenance.status }}</span>
+                            {% else %}
+                                <span class="maintenance-status">No Maintenance</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if maintenance and maintenance.scheduled_date <= subject.end_time and maintenance.scheduled_date >= subject.start_time %}
+                                <a href="{{ url_for('main.borrow_laptop', subject_id=subject.id) }}" class="btn btn-sm btn-primary">Borrow Laptop</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                    
+                </tbody>
+                
+            </table>
+        {% else %}
+            <p>You are not enrolled in any subjects.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+    <!-- Calendar View of Subjects -->
+    <div class="card">
+        <div class="card-header">
+            Your Schedule
+        </div>
+        <div class="card-body">
+            <div id='calendar'></div>
+        </div>
+    </div>
+
+<!-- Existing Issue Reports Section -->
+<h2>Your Issue Reports</h2>
+{% if issue_reports %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>PC</th>
+            <th>Issue Type</th>
+            <th>Software</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Reported At</th>
+            <th>Last Updated</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for issue in issue_reports %}
+        <tr>
+            <td>{{ issue.equipment.equipment_name }}</td>
+            <td>{{ issue.issue_type.value }}</td>
+            <td>{{ issue.software if issue.software else '-' }}</td>
+            <td>{{ issue.description }}</td>
+            <td>{{ issue.status }}</td>
+            <td>{{ issue.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>
+                {% if issue.updated_at %}
+                    {{ issue.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                <a href="{{ url_for('main.view_issue', issue_id=issue.id) }}" class="btn btn-sm btn-info">View</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>You have not reported any issues.</p>
+{% endif %}
+
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- Include FullCalendar JS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: '{{ url_for("main.get_subjects") }}',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        eventClick: function(info) {
+            // Optional: Display subject details on event click
+            alert('Subject: ' + info.event.title + '\n' +
+                  'Start: ' + info.event.start.toLocaleString() + '\n' +
+                  'End: ' + info.event.end.toLocaleString());
+        }
+    });
+
+    calendar.render();
+});
+
+    </script>
+{% endblock %}

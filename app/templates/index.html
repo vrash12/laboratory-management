@@ -1,0 +1,17 @@
+<!-- app/templates/index.html -->
+{% extends 'base.html' %}
+{% block title %}Home - TSU CCS Lab Management{% endblock %}
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to TSU CCS Lab Management System</h1>
+    {% if current_user.is_authenticated %}
+        <p class="lead">Hello, {{ current_user.full_name }}!</p>
+        <hr class="my-4">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('main.dashboard') }}" role="button">Go to Dashboard</a>
+    {% else %}
+        <p class="lead">Please log in to continue.</p>
+        <hr class="my-4">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('main.login') }}" role="button">Login</a>
+    {% endif %}
+</div>
+{% endblock %}

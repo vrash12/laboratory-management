@@ -1,0 +1,38 @@
+<!-- app/templates/admin/create_maintenance.html -->
+
+{% extends 'base.html' %}
+{% block title %}Create Maintenance Task{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Create Maintenance Task</h2>
+    <form method="POST" action="{{ url_for('admin.create_maintenance') }}">
+        <div class="mb-3">
+            <label for="equipment_id" class="form-label">Select Equipment</label>
+            <select class="form-select" id="equipment_id" name="equipment_id" required>
+                <option value="" disabled selected>Select Equipment</option>
+                {% for equipment in equipments %}
+                    <option value="{{ equipment.id }}">{{ equipment.room.room_name }} - {{ equipment.equipment_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Maintenance Description</label>
+            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="scheduled_date" class="form-label">Scheduled Date and Time</label>
+            <input type="datetime-local" class="form-control" id="scheduled_date" name="scheduled_date" required>
+        </div>
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status" required>
+                <option value="Scheduled" selected>Scheduled</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Maintenance Task</button>
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </form>
+</div>
+{% endblock %}

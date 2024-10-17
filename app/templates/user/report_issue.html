@@ -1,0 +1,74 @@
+<!-- app/templates/user/report_issue.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Report an Issue</h2>
+<form method="post">
+    <div class="form-group">
+        <label for="equipment_id">Select Equipment:</label>
+        <select class="form-control" id="equipment_id" name="equipment_id" required>
+            {% for pc in pcs %}
+                <option value="{{ pc.id }}">{{ pc.equipment_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="issue_type">Issue Type:</label>
+        <select class="form-control" id="issue_type" name="issue_type" required onchange="toggleSoftwareField()">
+            <option value="Hardware">Hardware</option>
+            <option value="Software">Software</option>
+            <option value="Both">Both</option>
+        </select>
+    </div>
+    <div class="form-group" id="software_field" style="display: none;">
+        <label for="software">Affected Software:</label>
+        <select class="form-control" id="software" name="software">
+            <option value="" selected disabled>Select Software</option>
+            {% for software_name in common_software %}
+                <option value="{{ software_name }}">{{ software_name }}</option>
+            {% endfor %}
+            <option value="Other">Other</option>
+        </select>
+        <input type="text" class="form-control mt-2" id="software_other" name="software_other" placeholder="Enter software name" style="display: none;">
+    </div>
+    <div class="form-group">
+        <label for="description">Issue Description:</label>
+        <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Issue</button>
+</form>
+
+<script>
+    function toggleSoftwareField() {
+        var issueType = document.getElementById('issue_type').value;
+        var softwareField = document.getElementById('software_field');
+        if (issueType === 'Software' || issueType === 'Both') {
+            softwareField.style.display = 'block';
+        } else {
+            softwareField.style.display = 'none';
+        }
+    }
+
+    function toggleSoftwareOther() {
+        var softwareSelect = document.getElementById('software');
+        var softwareOther = document.getElementById('software_other');
+        if (softwareSelect.value === 'Other') {
+            softwareOther.style.display = 'block';
+            softwareOther.required = true;
+        } else {
+            softwareOther.style.display = 'none';
+            softwareOther.required = false;
+        }
+    }
+
+    // Call the functions on page load to set the correct visibility
+    window.onload = function() {
+        toggleSoftwareField();
+        toggleSoftwareOther();
+    };
+
+    // Add event listener for software select change
+    document.getElementById('software').addEventListener('change', toggleSoftwareOther);
+</script>
+{% endblock %}

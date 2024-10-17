@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Edit PC{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit PC: {{ pc.equipment_name }}</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="equipment_name" class="form-label">PC Name</label>
+            <input type="text" class="form-control" id="equipment_name" name="equipment_name" value="{{ pc.equipment_name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status" required>
+                <option value="Operational" {% if pc.status == 'Operational' %}selected{% endif %}>Operational</option>
+                <option value="Under Maintenance" {% if pc.status == 'Under Maintenance' %}selected{% endif %}>Under Maintenance</option>
+                <option value="Out of Service" {% if pc.status == 'Out of Service' %}selected{% endif %}>Out of Service</option>
+            </select>
+        </div>
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" value="1" id="is_available" name="is_available" {% if pc.is_available %}checked{% endif %}>
+            <label class="form-check-label" for="is_available">
+                Available
+            </label>
+        </div>
+        <button type="submit" class="btn btn-primary">Update PC</button>
+        <a href="{{ url_for('admin.view_pcs', room_id=pc.room_id) }}" class="btn btn-secondary">Back to PCs</a>
+    </form>
+</div>
+{% endblock %}

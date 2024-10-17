@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Assign Students{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Assign Students to {{ subject.subject_code }} - {{ subject.subject_name }}</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="students" class="form-label">Select Students</label>
+            <select class="form-select" id="students" name="student_ids" multiple required>
+                {% for user in users %}
+                <option value="{{ user.id }}"
+                    {% if user.id in assigned_student_ids %}selected{% endif %}>
+                    {{ user.full_name }} ({{ user.email }})
+                </option>
+                {% endfor %}
+            </select>
+            <div class="form-text">Hold Ctrl or Command to select multiple students.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Assign Students</button>
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </form>
+</div>
+{% endblock %}

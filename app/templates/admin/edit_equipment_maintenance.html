@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Edit Maintenance{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Maintenance for {{ equipment.equipment_name }}</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="status">Maintenance Status:</label>
+            <select class="form-control" id="status" name="status" required>
+                <option value="Scheduled" {% if maintenance and maintenance.status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+                <option value="In Progress" {% if maintenance and maintenance.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                <option value="Completed" {% if maintenance and maintenance.status == 'Completed' %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="scheduled_date">Scheduled Date and Time:</label>
+            <input type="datetime-local" class="form-control" id="scheduled_date" name="scheduled_date" value="{{ maintenance.scheduled_date.strftime('%Y-%m-%dT%H:%M') if maintenance else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Maintenance Description:</label>
+            <textarea class="form-control" id="description" name="description" rows="4" required>{{ maintenance.description if maintenance else '' }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Maintenance</button>
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

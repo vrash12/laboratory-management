@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Manage Borrow Requests{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Manage Borrow Requests</h2>
+    <table id="borrowRequestsTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Laptop</th>
+                <th>Request Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in borrow_requests %}
+            <tr>
+                <td>{{ request.user.full_name }}</td>
+                <td>{{ request.equipment.equipment_name }}</td>
+                <td>{{ request.request_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ request.status.value }}</td>
+                <td>
+                    {% if request.status == 'Pending' %}
+                    <form action="{{ url_for('admin.process_borrow_request', request_id=request.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">Approve</button>
+                        <button type="submit" name="action" value="deny" class="btn btn-danger btn-sm">Deny</button>
+                    </form>
+                    {% elif request.status == 'Approved' %}
+                    <form action="{{ url_for('admin.mark_as_returned', request_id=request.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-warning btn-sm">Mark as Returned</button>
+                    </form>
+                    {% else %}
+                    No actions available
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#borrowRequestsTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+
+{% extends 'base.html' %}
+{% block title %}Add Laptops{% endblock %}
+{% block head %}
+    {{ super() }}
+    <!-- Optional: Additional CSS can be added here -->
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Add Laptops</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="num_laptops">Number of Laptops to Add:</label>
+            <input type="number" class="form-control" id="num_laptops" name="num_laptops" value="30" min="1" required>
+        </div>
+        <div class="form-group">
+            <label for="starting_index">Starting Index (e.g., 1 for Laptop-1):</label>
+            <input type="number" class="form-control" id="starting_index" name="starting_index" value="1" min="1" required>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Add Laptops</button>
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <!-- Optional: Additional JS can be added here -->
+{% endblock %}

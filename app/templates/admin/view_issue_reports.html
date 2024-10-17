@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Issue Reports{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Issue Reports</h2>
+    <table id="issueReportsTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Reported By</th>
+                <th>Equipment</th>
+                <th>Issue Type</th>
+                <th>Software</th>
+                <th>Description</th>
+                <th>Reported At</th>
+                <th>Status</th>
+                <th>Update Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for issue in issues %}
+            <tr>
+                <td>{{ issue.user.full_name }}</td>
+                <td>{{ issue.equipment.equipment_name }} ({{ issue.equipment.room.room_name if issue.equipment.room else 'No Room' }})</td>
+                <td>{{ issue.issue_type.value }}</td>
+                <td>{{ issue.software if issue.software else '-' }}</td>
+                <td>{{ issue.description }}</td>
+                <td>{{ issue.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ issue.status }}</td>
+                <td>
+                    <form action="{{ url_for('admin.update_issue_status', issue_id=issue.id) }}" method="POST">
+                        <select name="status" class="form-select mb-2">
+                            <option value="Pending" {% if issue.status == 'Pending' %}selected{% endif %}>Pending</option>
+                            <option value="In Progress" {% if issue.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                            <option value="Resolved" {% if issue.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- DataTables JS (Include if not already included) -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#issueReportsTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true
+        });
+    });
+</script>
+{% endblock %}

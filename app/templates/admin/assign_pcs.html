@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Assign PCs{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Assign PCs for {{ subject.subject_code }} - {{ subject.subject_name }}</h2>
+    <form method="POST">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Assign PC</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.full_name }} ({{ student.email }})</td>
+                    <td>
+                        <select class="form-select" name="pc_student_{{ student.id }}" required>
+                            <option value="" disabled selected>Select a PC</option>
+                            {% for pc in pcs %}
+                            <option value="{{ pc.id }}"
+                                {% if pc_assignments.get(student.id) == pc.id %}selected{% endif %}>
+                                {{ pc.equipment_name }} - {{ pc.status }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Assign PCs</button>
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+<!--app/templates/user/view_issue.html-->
+{% extends 'base.html' %}
+{% block title %}Issue Details{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Issue Details</h2>
+    <div class="card">
+        <div class="card-header">
+            {{ issue.equipment.equipment_name }} - {{ issue.equipment.room.room_name }}
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Reported By: {{ issue.user.full_name }}</h5>
+            <p class="card-text"><strong>Description:</strong> {{ issue.description }}</p>
+            <p class="card-text"><strong>Status:</strong> {{ issue.status }}</p>
+            <p class="card-text"><strong>Reported At:</strong> {{ issue.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            {% if issue.updated_at %}
+                <p class="card-text"><strong>Last Updated:</strong> {{ issue.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            {% endif %}
+        </div>
+    </div>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>
+{% endblock %}

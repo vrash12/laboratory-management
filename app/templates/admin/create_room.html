@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Create Room{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Create Room</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="room_name" class="form-label">Room Name</label>
+            <input type="text" class="form-control" id="room_name" name="room_name" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Room</button>
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </form>
+</div>
+{% endblock %}

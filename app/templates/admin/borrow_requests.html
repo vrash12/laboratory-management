@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Borrow Requests{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Borrow Requests</h2>
+    {% if requests %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Request ID</th>
+                    <th>User</th>
+                    <th>Equipment</th>
+                    <th>Status</th>
+                    <th>Request Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                <tr>
+                    <td>{{ request.id }}</td>
+                    <td>{{ request.user.full_name }}</td>
+                    <td>{{ request.equipment.equipment_name }}</td>
+                    <td>{{ request.status.value }}</td>
+                    <td>{{ request.request_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {% if request.status == BorrowRequestStatus.Pending %}
+                            <form method="POST" action="{{ url_for('admin.update_borrow_request_status', request_id=request.id) }}">
+                                <input type="hidden" name="status" value="{{ BorrowRequestStatus.Approved.value }}">
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('admin.update_borrow_request_status', request_id=request.id) }}">
+                                <input type="hidden" name="status" value="{{ BorrowRequestStatus.Denied.value }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Deny</button>
+                            </form>
+                        {% elif request.status == BorrowRequestStatus.Approved %}
+                            <form method="POST" action="{{ url_for('admin.update_borrow_request_status', request_id=request.id) }}">
+                                <input type="hidden" name="status" value="{{ BorrowRequestStatus.Returned.value }}">
+                                <button type="submit" class="btn btn-info btn-sm">Mark as Returned</button>
+                            </form>
+                        {% else %}
+                            <!-- No actions for Denied or Returned requests -->
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No borrow requests at this time.</p>
+    {% endif %}
+</div>
+{% endblock %}

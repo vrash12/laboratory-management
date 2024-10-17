@@ -1,0 +1,277 @@
+<!-- app/templates/admin/admin_dashboard.html -->
+
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block head %}
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <style>
+  
+        .action-btn {
+            margin-right: 5px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Admin Dashboard</h2>
+    <p>Welcome, {{ current_user.full_name }}!</p>
+
+    <!-- Rooms Section -->
+    <div class="mb-5">
+        <h3>Rooms</h3>
+        <a href="{{ url_for('admin.create_room') }}" class="btn btn-success mb-3">Create New Room</a>
+        <table id="roomsTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Room Name</th>
+                    <th>Number of PCs</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                <tr>
+                    <td>{{ room.room_name }}</td>
+                    <td>{{ room.pcs|length }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.view_pcs', room_id=room.id) }}" class="btn btn-primary btn-sm action-btn">View PCs</a>
+                        <a href="{{ url_for('admin.edit_room', room_id=room.id) }}" class="btn btn-warning btn-sm action-btn">Edit</a>
+                        <form action="{{ url_for('admin.delete_room', room_id=room.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm action-btn" onclick="return confirm('Are you sure you want to delete this room?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Subjects Section -->
+    <div class="mb-5">
+        <h3>Subjects</h3>
+        <a href="{{ url_for('admin.create_subject') }}" class="btn btn-success mb-3">Create New Subject</a>
+        <table id="subjectsTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>Room</th>
+                    <th>Schedule</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in subjects %}
+                <tr>
+                    <td>{{ subject.subject_code }}</td>
+                    <td>{{ subject.subject_name }}</td>
+                    <td>{{ subject.room.room_name }}</td>
+                    <td>{{ subject.start_time.strftime('%Y-%m-%d %H:%M') }} - {{ subject.end_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.assign_students', subject_id=subject.id) }}" class="btn btn-primary btn-sm action-btn">Assign Students</a>
+                        <a href="{{ url_for('admin.assign_pcs', subject_id=subject.id) }}" class="btn btn-secondary btn-sm action-btn">Assign PCs</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Students and PC Assignments Section -->
+
+    <div class="mb-5">
+        <h3>Students and PC Assignments</h3>
+        <table id="studentsTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                    <th>PC Assigned</th>
+                    <th>Maintenance Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in pc_assignments %}
+                <tr>
+                    <td>{{ assignment.student.full_name }}</td>
+                    <td>{{ assignment.student.email }}</td>
+                    <td>{{ assignment.subject.subject_code }} - {{ assignment.subject.subject_name }}</td>
+                    <td>{{ assignment.equipment.equipment_name }} ({{ assignment.equipment.room.room_name }})</td>
+                    <td>
+                        {% set maintenance = maintenance_dict.get(assignment.equipment.id) %}
+                        {% if maintenance %}
+                            {{ maintenance.status }}
+                        {% else %}
+                            No Maintenance
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin.edit_equipment_maintenance', equipment_id=assignment.equipment.id) }}" class="btn btn-sm btn-warning">Edit Maintenance</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+        <!-- Maintenance Management Section -->
+        <div class="mb-5">
+            <h3>Maintenance Management</h3>
+            <div class="mb-3">
+                <a href="{{ url_for('admin.create_maintenance') }}" class="btn btn-success">Create New Maintenance Task</a>
+                <a href="{{ url_for('admin.add_laptops') }}" class="btn btn-success">Add Laptops</a>
+            </div>
+            <table id="maintenancesTable" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Equipment</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Scheduled Date</th>
+                        <th>Completed Date</th>
+                        <th>Reported By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for maintenance in maintenances %}
+                    <tr>
+                        <td>{{ maintenance.equipment.equipment_name }} ({{ maintenance.equipment.room.room_name }})</td>
+                        <td>{{ maintenance.description }}</td>
+                        <td>{{ maintenance.status }}</td>
+                        <td>{{ maintenance.scheduled_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if maintenance.completed_date %}
+                                {{ maintenance.completed_date.strftime('%Y-%m-%d %H:%M') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ maintenance.reporter.full_name }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.edit_maintenance', maintenance_id=maintenance.id) }}" class="btn btn-warning btn-sm action-btn">Edit</a>
+                            <form action="{{ url_for('admin.delete_maintenance', maintenance_id=maintenance.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm action-btn" onclick="return confirm('Are you sure you want to delete this maintenance task?');">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    <!-- Issue Reports Section -->
+<div class="mb-5">
+    <h3>New Issue Reports</h3>
+    {% if new_issues %}
+    <table id="issueReportsTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Reported By</th>
+                <th>Equipment</th>
+                <th>Issue Type</th>
+                <th>Software</th>
+                <th>Description</th>
+                <th>Reported At</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for issue in new_issues %}
+            <tr>
+                <td>{{ issue.user.full_name }}</td>
+                <td>{{ issue.equipment.equipment_name }} ({{ issue.equipment.room.room_name if issue.equipment.room else 'No Room' }})</td>
+                <td>{{ issue.issue_type.value }}</td>
+                <td>{{ issue.software if issue.software else '-' }}</td>
+                <td>{{ issue.description }}</td>
+                <td>{{ issue.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ issue.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No new issue reports.</p>
+    {% endif %}
+    <a href="{{ url_for('admin.view_issue_reports') }}" class="btn btn-primary">View All Issue Reports</a>
+</div>
+
+<!-- Borrow Requests Section -->
+<div class="mb-5">
+    <h3>Laptop Borrow Requests</h3>
+    {% if pending_borrow_requests %}
+    <table id="borrowRequestsTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Laptop</th>
+                <th>Request Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in pending_borrow_requests %}
+            <tr>
+                <td>{{ request.user.full_name }}</td>
+                <td>{{ request.equipment.equipment_name }}</td>
+                <td>{{ request.request_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ request.status.value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No pending borrow requests.</p>
+    {% endif %}
+    <a href="{{ url_for('admin.view_borrow_requests') }}" class="btn btn-primary">Manage Borrow Requests</a>
+</div>
+
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#roomsTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true
+            });
+
+            $('#subjectsTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true
+            });
+
+            $('#studentsTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true
+            });
+
+            $('#maintenancesTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true
+            });
+        });
+    </script>
+{% endblock %}

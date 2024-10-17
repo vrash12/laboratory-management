@@ -1,0 +1,86 @@
+[
+    {
+        "student_number": "2022001",
+        "username": "student1",
+        "full_name": "Juan Dela Cruz",
+        "email": "juan.delacruz@tsu.edu.ph",
+        "password": "password1",
+        "role": "User"
+    },
+    {
+        "student_number": "2022002",
+        "username": "student2",
+        "full_name": "Maria Clara Santos",
+        "email": "maria.clara@tsu.edu.ph",
+        "password": "password2",
+        "role": "User"
+    },
+
+
+    {
+        "student_number": "2022003",
+        "username": "student3",
+        "full_name": "Jose Rizal",
+        "email": "jose.rizal@tsu.edu.ph",
+        "password": "password3",
+        "role": "User"
+    },
+    {
+        "student_number": "2022004",
+        "username": "student4",
+        "full_name": "Ana Maria Reyes",
+        "email": "ana.maria@tsu.edu.ph",
+        "password": "password4",
+        "role": "User"
+    },
+    {
+        "student_number": "2022005",
+        "username": "student5",
+        "full_name": "Carlos P. Garcia",
+        "email": "carlos.garcia@tsu.edu.ph",
+        "password": "password5",
+        "role": "User"
+    },
+    {
+        "student_number": "2022006",
+        "username": "student6",
+        "full_name": "Luisa S. Mercado",
+        "email": "luisa.mercado@tsu.edu.ph",
+        "password": "password6",
+        "role": "User"
+    },
+    {
+        "student_number": "2022007",
+        "username": "student7",
+        "full_name": "Pedro Penduko",
+        "email": "pedro.penduko@tsu.edu.ph",
+        "password": "password7",
+        "role": "User"
+    },
+    {
+        "student_number": "2022008",
+        "username": "student8",
+        "full_name": "Isabella Torres",
+        "email": "isabella.torres@tsu.edu.ph",
+        "password": "password8",
+        "role": "User"
+    },
+
+    
+    {
+        "student_number": "2022009",
+        "username": "student9",
+        "full_name": "Miguel Rivera",
+        "email": "miguel.rivera@tsu.edu.ph",
+        "password": "password9",
+        "role": "User"
+    },
+    {
+        "student_number": "2022010",
+        "username": "student10",
+        "full_name": "Catalina Cruz",
+        "email": "catalina.cruz@tsu.edu.ph",
+        "password": "password10",
+        "role": "User"
+    }
+]
